@@ -4,8 +4,23 @@ import Card from "react-bootstrap/Card";
 import "./Movie.css";
 import { useState } from "react";
 import MovieModal from "../modal_movie/ModalMovie";
-function Movie({ movie }) {
+import axios from "axios";
+function Movie({ movie, isFavPage }) {
   const [showFlag, setShowFlag] = useState(false);
+  //const [isDeleted, setIsDeleted] = useState(false);
+
+  const deleteMovie = () => {
+    const serverURL = `${process.env.REACT_APP_serverURL}/DELETE/${movie.id}`;
+    axios
+      .delete(serverURL)
+      .then((response) => {
+        // setIsDeleted(true);
+        window.location.reload();
+      })
+      .catch((error) => console.log(error));
+
+    // window.location.reload();
+  };
 
   const handleShow = () => {
     setShowFlag(true);
@@ -32,13 +47,26 @@ function Movie({ movie }) {
           {/* <Card.Text>
           <p>{movie.overview || "No overview"}</p>
         </Card.Text> */}
-          <Button
-            className="btn"
-            variant="primary"
-            onClick={() => handleShow()}
-          >
-            Add to Favorite
-          </Button>
+          {!isFavPage && (
+            <Button
+              className="btn"
+              variant="primary"
+              onClick={() => handleShow()}
+            >
+              Add to Favorite
+            </Button>
+          )}
+
+          {isFavPage && (
+            <div className="upd-del-buttons">
+              <Button onClick={() => handleShow()} variant="primary">
+                Update
+              </Button>
+              <Button onClick={deleteMovie} variant="danger">
+                Delete
+              </Button>
+            </div>
+          )}
         </Card.Body>
       </Card>
 
@@ -46,6 +74,7 @@ function Movie({ movie }) {
         showFlag={showFlag}
         handleClose={handleClose}
         clickedMovie={movie}
+        isFavPage={isFavPage}
       />
     </>
   );
